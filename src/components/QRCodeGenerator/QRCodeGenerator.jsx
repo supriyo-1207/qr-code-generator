@@ -4,7 +4,7 @@ import InputField from './InputField';
 import CustomizationPanel from './CustomizationPanel';
 import PreviewPanel from './PreviewPanel';
 import { getInputLabelByType, getPlaceholderByType, formatQRValue } from './utils';
-
+import QRUsageTracker from './QRUsageTracker';
 const QRCodeGenerator = () => {
   // State management
   const [qrType, setQrType] = useState('link');
@@ -16,7 +16,9 @@ const QRCodeGenerator = () => {
   const [isGenerated, setIsGenerated] = useState(false);
   
   const qrRef = useRef(null);
-  
+  // Reference to the usage tracker
+  const usageTrackerRef = useRef();
+
   const handleTypeChange = (type) => {
     setQrType(type);
     // Set default values based on type
@@ -31,6 +33,9 @@ const QRCodeGenerator = () => {
   };
   
   const generateQRCode = () => {
+    if (usageTrackerRef.current && usageTrackerRef.current.handleGenerateQR()) {
+      setIsGenerated(true);
+    }
     if (!qrValue.trim()) return;
     
     // Format the QR value based on type
@@ -74,6 +79,9 @@ const QRCodeGenerator = () => {
 
   return (
     <div className="flex flex-col lg:flex-row w-full max-w-6xl mx-auto gap-8 p-6 min-h-screen bg-gray-50">
+      {/* Include usage tracker component with ref */}
+      <QRUsageTracker ref={usageTrackerRef} />
+
       {/* Input Section */}
       <div className="w-full lg:w-1/2 flex flex-col gap-6 bg-white p-8 rounded-xl shadow-md">
         <h1 className="text-3xl font-bold text-gray-800">QR Code Generator</h1>
