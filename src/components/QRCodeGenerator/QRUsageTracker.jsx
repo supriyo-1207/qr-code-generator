@@ -9,7 +9,26 @@ const QRUsageTracker = forwardRef((props, ref) => {
   });
   
   const [showModal, setShowModal] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // Initialize authentication state from localStorage
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+  
+  // Check authentication status whenever component renders
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const authStatus = localStorage.getItem('isAuthenticated') === 'true';
+      setIsAuthenticated(authStatus);
+    };
+    
+    // Check immediately
+    checkAuthStatus();
+    
+    // Set up an interval to check periodically (optional, but helps with sync issues)
+    const intervalId = setInterval(checkAuthStatus, 1000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
   
   // Update localStorage when count changes
   useEffect(() => {
@@ -19,11 +38,15 @@ const QRUsageTracker = forwardRef((props, ref) => {
     if (qrCount >= 3 && !isAuthenticated && !showModal) {
       setShowModal(true);
     }
-  }, [qrCount, isAuthenticated]);
+  }, [qrCount, isAuthenticated, showModal]);
   
   const handleGenerateQR = () => {
+    // First, check the current authentication status from localStorage
+    const currentAuthStatus = localStorage.getItem('isAuthenticated') === 'true';
+    setIsAuthenticated(currentAuthStatus);
+    
     // This function would be called whenever a QR code is generated
-    if (isAuthenticated || qrCount < 3) {
+    if (currentAuthStatus || qrCount < 3) {
       // Logic to generate QR code
       setQrCount(prevCount => prevCount + 1);
       return true; // QR generation allowed
@@ -33,20 +56,6 @@ const QRUsageTracker = forwardRef((props, ref) => {
     }
   };
   
-  // const handleLogin = () => {
-  //   // Placeholder for login logic
-  //   // You would typically redirect to login page or show login form
-  //   setIsAuthenticated(true);
-  //   setShowModal(false);
-  // };
-  
-  // const handleSignup = () => {
-  //   // Placeholder for signup logic
-  //   // You would typically redirect to signup page or show signup form
-  //   setIsAuthenticated(true);
-  //   setShowModal(false);
-  // };
-  
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
     handleGenerateQR,
@@ -55,18 +64,24 @@ const QRUsageTracker = forwardRef((props, ref) => {
       localStorage.setItem('qrGeneratedCount', '0');
     },
     getCount: () => qrCount,
-    isAuthenticated: () => isAuthenticated,
-    setAuthenticated: (value) => setIsAuthenticated(value)
+    isAuthenticated: () => localStorage.getItem('isAuthenticated') === 'true', // Always check localStorage
+    setAuthenticated: (value) => {
+      setIsAuthenticated(value);
+      // Optionally sync with localStorage if you're using this method
+      if (value) {
+        localStorage.setItem('isAuthenticated', 'true');
+      } else {
+        localStorage.removeItem('isAuthenticated');
+      }
+    }
   }));
   
   return (
     <>
       {/* The modal component */}
-      <UsageLimitModal 
+      <UsageLimitModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        // onLogin={handleLogin}
-        // onSignup={handleSignup}
       />
     </>
   );

@@ -1,79 +1,36 @@
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
-// Create the context
 const AuthContext = createContext();
 
-// Provider component
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const qrUsageTrackerRefs = useRef([]);
   
-  // Register QRUsageTracker refs to update when auth state changes
-  const registerQRUsageTracker = (ref) => {
-    if (ref && !qrUsageTrackerRefs.current.includes(ref)) {
-      qrUsageTrackerRefs.current.push(ref);
+  useEffect(() => {
+    // Check if user is already authenticated on component mount
+    const auth = localStorage.getItem('isAuthenticated');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
     }
-  };
-  
-  // Update all registered QRUsageTrackers when auth state changes
-  useEffect(() => {
-    qrUsageTrackerRefs.current.forEach(tracker => {
-      if (tracker.current && tracker.current.setAuthenticated) {
-        tracker.current.setAuthenticated(isAuthenticated);
-      }
-    });
-  }, [isAuthenticated]);
-  
-  // Check if user is already logged in (from localStorage)
-  useEffect(() => {
-    const checkAuthStatus = () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-        setIsAuthenticated(true);
-      }
-    };
-    
-    checkAuthStatus();
   }, []);
   
-  // Auth functions
   const login = () => {
-    // Here you would implement actual login logic
-    // For demo purposes:
-    const demoUser = { id: 1, name: "Demo User" };
-    setUser(demoUser);
+    localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(demoUser));
   };
   
   const signup = () => {
-    // Here you would implement actual signup logic
-    // For demo purposes:
-    const newUser = { id: Date.now(), name: "New User" };
-    setUser(newUser);
+    localStorage.setItem('isAuthenticated', 'true');
     setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(newUser));
   };
   
   const logout = () => {
-    setUser(null);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
-    localStorage.removeItem('user');
   };
   
   return (
-    <AuthContext.Provider 
-      value={{ 
-        isAuthenticated, 
-        user, 
-        login, 
-        signup, 
-        logout, 
-        registerQRUsageTracker 
-      }}
-    >
+    <AuthContext.Provider value={{ isAuthenticated, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

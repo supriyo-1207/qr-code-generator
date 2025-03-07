@@ -1,23 +1,58 @@
-import React, { useState, useContext } from 'react';
-import AuthContext from '../context/AuthContext'; // We'll create this context
-import { Link,useNavigate  } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import AuthContext from '../context/AuthContext'; 
+import {  useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, login, signup, logout } = useContext(AuthContext);
+  const { isAuthenticated, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Check localStorage on component mount
+  useEffect(() => {
+    const checkAuth = () => {
+      const auth = localStorage.getItem('isAuthenticated');
+      return auth === 'true';
+    };
+    
+    // Force re-render if authentication state changes
+    const interval = setInterval(checkAuth, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const handlelogout = () => {
-    navigate('/login'); // Redirect to the login page
+  
+  const handleLogout = async() => {
+    try {
+      const response = await axios.post("http://localhost:5000/api/v1/auth/logout",{
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+      
+      if (response.status === 200) {
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('token');
+        toast.success("Logout successful");
+        navigate('/signin'); // Redirect to the login page
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    navigate('/signin'); // Redirect to the login page
   };
+  
   const handleLogin = () => {
     navigate('/signin'); // Redirect to the login page
   };
-  const handlesignup = () => {
-    navigate('/signup'); // Redirect to the login page
+  
+  const handleSignup = () => {
+    navigate('/signup'); // Redirect to the signup page
   };
+  
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm px-4 py-3">
       <div className="container mx-auto flex justify-between items-center">
@@ -40,27 +75,11 @@ const Navbar = () => {
           <span className="text-xl font-bold text-gray-800">QR Generator</span>
         </div>
         
-        {/* Desktop Navigation */}
-        {/* <div className="hidden md:flex items-center space-x-4">
-          <Link to="#features" className="text-gray-600 hover:text-blue-600 transition-colors">
-            Features
-          </Link>
-          <Link to="#templates" className="text-gray-600 hover:text-blue-600 transition-colors">
-            Templates
-            </Link>
-          <Link to="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">
-            Pricing
-            </Link>
-          <Link to="#help" className="text-gray-600 hover:text-blue-600 transition-colors">
-            Help
-            </Link>
-        </div> */}
-        
         {/* Authentication Buttons */}
         <div className="hidden md:flex items-center space-x-3">
-          {isAuthenticated ? (
+          {localStorage.getItem('isAuthenticated') === 'true' ? (
             <button 
-              onClick={handlelogout}
+              onClick={handleLogout}
               className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
               Log out
@@ -74,7 +93,7 @@ const Navbar = () => {
                 Log in
               </button>
               <button 
-                onClick={handlesignup}
+                onClick={handleSignup}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium transition-colors"
               >
                 Sign up free
@@ -105,22 +124,10 @@ const Navbar = () => {
       {/* Mobile menu */}
       {isMenuOpen && (
         <div className="md:hidden mt-2 px-2 pt-2 pb-4 space-y-1">
-         <Link to="#features" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600">
-            Features
-            </Link>
-          <Link to="#templates" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600">
-            Templates
-            </Link>
-          <Link to="#pricing" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600">
-            Pricing
-            </Link>
-          <Link to="#help" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 hover:text-blue-600">
-            Help
-            </Link>
           <div className="pt-4 border-t border-gray-200">
-            {isAuthenticated ? (
+            {localStorage.getItem('isAuthenticated') === 'true' ? (
               <button 
-                onClick={handlelogout}
+                onClick={handleLogout}
                 className="w-full px-3 py-2 text-left text-blue-600 hover:bg-gray-100 rounded-md"
               >
                 Log out
@@ -134,7 +141,7 @@ const Navbar = () => {
                   Log in
                 </button>
                 <button 
-                  onClick={handlesignup}
+                  onClick={handleSignup}
                   className="w-full mt-2 px-3 py-2 text-left text-white bg-blue-600 rounded-md hover:bg-blue-700"
                 >
                   Sign up free
