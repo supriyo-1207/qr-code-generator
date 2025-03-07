@@ -24,11 +24,11 @@ const Navbar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  const API_URL = import.meta.env.VERCEl_API_URL || "http://localhost:5000";
+  // const API_URL = import.meta.env.VERCEl_API_URL || "http://localhost:5000";
 
   const handleLogout = async() => {
     try {
-      const response = await axios.post(`${API_URL}/api/auth/logout`,{
+      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/auth/logout",{
         headers: {
           "Content-Type": "application/json",
         }

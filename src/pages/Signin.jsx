@@ -10,7 +10,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VERCEl_API_URL || "http://localhost:5000";
+  // const API_URL = import.meta.env.VERCEl_API_URL || "http://localhost:5000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ const SignIn = () => {
    
     
     try {
-      const response = await axios.post(`${API_URL}/api/v1/auth/signin`, {
+      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/auth/signin ", {
         email: email,
         password: password,
       }, {
