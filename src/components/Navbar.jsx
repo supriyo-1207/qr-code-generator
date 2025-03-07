@@ -27,7 +27,7 @@ const Navbar = () => {
   
   const handleLogout = async() => {
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/auth/logout",{
+      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/v1/auth/logout",{
         headers: {
           "Content-Type": "application/json",
         }

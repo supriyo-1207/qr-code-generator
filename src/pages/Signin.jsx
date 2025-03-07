@@ -17,7 +17,7 @@ const SignIn = () => {
    
     
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/auth/signin", {
+      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/v1/auth/signin", {
         email: email,
         password: password,
       }, {
