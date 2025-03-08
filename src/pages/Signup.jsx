@@ -20,7 +20,7 @@ const SignUp = () => {
     try {
       setLoading(true);
       
-      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/v1/auth/ signup",
+      const response = await axios.post("https://qr-code-backend-liard.vercel.app/api/v1/auth/signup",
         {
           fullName: name,
           email: email,
