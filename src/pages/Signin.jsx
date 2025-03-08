@@ -43,7 +43,7 @@ const SignIn = () => {
     } catch (error) {
       setLoading(false);
       toast.error(error.response?.data?.message || "Invalid email or password");
-      // console.error("Login Error:", error.response?.data || error.message);
+      console.error("Login Error:", error.response?.data || error.message);
     }
   };
   

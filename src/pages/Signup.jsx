@@ -50,7 +50,7 @@ const SignUp = () => {
     } catch (error) {
       setLoading(false);
       toast.error(error.response?.data?.message || "Error creating account");
-      // console.error("Signup Error:", error.response?.data || error.message);
+      console.error("Signup Error:", error.response?.data || error.message);
     }
   };
   
