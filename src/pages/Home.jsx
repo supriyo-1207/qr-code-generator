@@ -1,6 +1,6 @@
 import React, { useRef, useContext, useEffect } from 'react';
 import QRCodeGenerator from '../components/QRCodeGenerator/QRCodeGenerator';
-// import Navbar from '../components/Navbar';
+import Navbar from '../components/Navbar';
 import AuthContext from '../context/AuthContext';
 
 function Home() {
@@ -17,7 +17,7 @@ function Home() {
   return (
     <>
       {/* Navbar */}
-      {/* <Navbar /> */}
+      <Navbar />
       
       {/* QR code generator */}
       <div className="min-h-screen bg-gray-50">
